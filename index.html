@@ -116,6 +116,8 @@
             <div id="iconoResultado" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"></div>
             <h2 id="tituloResultado" class="text-2xl font-bold text-slate-800"></h2>
             <p id="mensajeResultado" class="text-sm text-slate-500 mt-2 mb-6"></p>
+            enviarNotaAGoogleSheets(document.getElementById("resNota").innerText);
+
 
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left space-y-2 text-sm">
                 <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Puntaje Obtenido:</span> <strong id="resNota" class="text-indigo-600 font-mono text-base"></strong></div>
@@ -700,8 +702,10 @@ function enviarNotaAGoogleSheets(notaFinal) {
         console.error("Error al enviar a Google Sheets:", error);
     });
 }
-</script>
-; 
+<script>
+function enviarNotaAGoogleSheets(notaFinal) {
+    // 1. Pon tu enlace de Google Sheets aquí adentro (dejando las comillas)
+    const urlGoogleScript = "TU_URL_DE_GOOGLE_DEBE_IR_AQUÍ"; 
 
     // 2. Recogemos los datos que el alumno escribió al inicio
     const nombres = document.getElementById("nombreEstudiante").value;
@@ -731,6 +735,5 @@ function enviarNotaAGoogleSheets(notaFinal) {
     });
 }
 </script>
-
 </body>
 </html>
