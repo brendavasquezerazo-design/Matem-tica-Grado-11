@@ -499,6 +499,9 @@
                 document.getElementById('tituloResultado').innerText = "Examen Entregado";
                 document.getElementById('mensajeResultado').innerText = "Tus respuestas han sido registradas exitosamente en la plataforma.";
             }
+// Busca tu variable de la nota (por ejemplo si se llama 'nota' o 'puntaje') 
+// y pásala dentro de los paréntesis:
+enviarNotaAGoogleSheets(notaFinal); 
 
             document.getElementById('resNota').innerText = `${nota.toFixed(1)} / 10.0`;
             document.getElementById('resAciertos').innerText = `${anulado ? 0 : aciertos} de 30`;
@@ -660,5 +663,74 @@
             document.body.removeChild(link);
         }
     </script>
+    <!-- CÓDIGO DE CONEXIÓN A GOOGLE SHEETS -->
+<script>
+function enviarNotaAGoogleSheets(notaFinal) {
+    // 1. REEMPLAZA EL TEXTO DE ABAJO CON TU ENLACE LARGO DE GOOGLE (El que termina en /exec)
+    const urlGoogleScript = "<!-- CÓDIGO DE CONEXIÓN A GOOGLE SHEETS -->
+<script>
+function enviarNotaAGoogleSheets(notaFinal) {
+    // 1. REEMPLAZA EL TEXTO DE ABAJO CON TU ENLACE LARGO DE GOOGLE (El que termina en /exec)
+    const urlGoogleScript = "AQUÍ_PEGA_TU_URL_DE_EXEC_DE_GOOGLE"; 
+
+    // 2. Recogemos los datos que el alumno escribió al inicio
+    const nombres = document.getElementById("nombreEstudiante").value;
+    const apellidos = document.getElementById("apellidoEstudiante").value;
+    const codigo = document.getElementById("codigoEstudiante").value;
+    const nombreCompleto = nombres + " " + apellidos + " (" + codigo + ")";
+
+    const datosAEnviar = {
+        nombre: nombreCompleto,
+        nota: notaFinal
+    };
+
+    // 3. Enviamos los datos de manera automática a tu hoja de cálculo
+    fetch(urlGoogleScript, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datosAEnviar)
+    })
+    .then(() => {
+        console.log("Nota registrada con éxito en el servidor.");
+    })
+    .catch((error) => {
+        console.error("Error al enviar a Google Sheets:", error);
+    });
+}
+</script>
+"; 
+
+    // 2. Recogemos los datos que el alumno escribió al inicio
+    const nombres = document.getElementById("nombreEstudiante").value;
+    const apellidos = document.getElementById("apellidoEstudiante").value;
+    const codigo = document.getElementById("codigoEstudiante").value;
+    const nombreCompleto = nombres + " " + apellidos + " (" + codigo + ")";
+
+    const datosAEnviar = {
+        nombre: nombreCompleto,
+        nota: notaFinal
+    };
+
+    // 3. Enviamos los datos de manera automática a tu hoja de cálculo
+    fetch(urlGoogleScript, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datosAEnviar)
+    })
+    .then(() => {
+        console.log("Nota registrada con éxito en el servidor.");
+    })
+    .catch((error) => {
+        console.error("Error al enviar a Google Sheets:", error);
+    });
+}
+</script>
+
 </body>
 </html>
