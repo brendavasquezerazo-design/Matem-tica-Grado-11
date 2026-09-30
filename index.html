@@ -1,12 +1,18 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación del IV Período - Matemática</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         .no-select {
             -webkit-user-select: none;
@@ -14,666 +20,1252 @@
             -ms-user-select: none;
             user-select: none;
         }
+
         body {
             background-color: #f1f5f9;
         }
+
+        #capturaResultado {
+            position: absolute;
+            left: -99999px;
+            top: 0;
+            width: 700px;
+            background: white;
+            padding: 40px;
+        }
     </style>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-
-        // REEMPLAZA ESTOS VALORES CON LOS DE TU PROYECTO FIREBASE.
-        const firebaseConfig = {
-            apiKey: "REEMPLAZAR_API_KEY",
-            authDomain: "REEMPLAZAR_PROJECT_ID.firebaseapp.com",
-            projectId: "REEMPLAZAR_PROJECT_ID",
-            storageBucket: "REEMPLAZAR_PROJECT_ID.firebasestorage.app",
-            messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
-            appId: "REEMPLAZAR_APP_ID"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        window.FirebaseExam = { auth, db, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp };
-        window.dispatchEvent(new Event('firebase-ready'));
-    </script>
-
 </head>
-<body class="no-select text-slate-800 antialiased min-h-screen flex flex-col justify-between" oncontextmenu="return false;" oncopy="return false;" onpaste="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;">
+
+<body
+    class="no-select text-slate-800 antialiased min-h-screen flex flex-col justify-between"
+    oncontextmenu="return false;"
+    oncopy="return false;"
+    onpaste="return false;"
+    oncut="return false;"
+    ondragstart="return false;"
+    ondrop="return false;">
 
     <!-- ENCABEZADO -->
     <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+
             <div class="flex items-center space-x-3">
                 <div class="bg-indigo-700 p-2 rounded-lg">
                     <i class="fa-solid fa-square-root-variable text-xl text-indigo-200"></i>
                 </div>
+
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">Evaluación del IV Período</h1>
-                    <p class="text-xs text-indigo-200">Segundo Año de Bachillerato • Matemática</p>
+                    <h1 class="font-bold text-lg leading-tight">
+                        Evaluación del IV Período
+                    </h1>
+
+                    <p class="text-xs text-indigo-200">
+                        Segundo Año de Bachillerato • Matemática
+                    </p>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-4">
-                <div id="timerContainer" class="hidden bg-indigo-950 px-4 py-1.5 rounded-lg border border-indigo-700 flex items-center space-x-2">
-                    <i class="fa-regular fa-clock text-amber-400"></i>
-                    <span id="timer" class="font-mono text-lg font-bold text-amber-300">35:00</span>
-                </div>
-                <button onclick="abrirModalAdmin()" class="bg-indigo-800 hover:bg-indigo-700 text-xs px-3 py-2 rounded-lg border border-indigo-600 transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-lock"></i>
-                    <span class="hidden sm:inline">Acceso Docente</span>
-                </button>
+            <div id="timerContainer"
+                 class="hidden bg-indigo-950 px-4 py-1.5 rounded-lg border border-indigo-700 flex items-center space-x-2">
+
+                <i class="fa-regular fa-clock text-amber-400"></i>
+
+                <span id="timer"
+                      class="font-mono text-lg font-bold text-amber-300">
+                    35:00
+                </span>
             </div>
+
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
+
+    <!-- CONTENIDO -->
     <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 
-        <!-- PANTALLA DE INICIO (REGISTRO ESTUDIANTE) -->
-        <div id="pantallaInicio" class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 md:p-8">
+        <!-- REGISTRO -->
+        <div id="pantallaInicio"
+             class="bg-white rounded-2xl shadow-xl border border-slate-200 p-6 md:p-8">
+
             <div class="text-center max-w-xl mx-auto mb-8">
+
                 <div class="inline-block p-3 bg-indigo-50 text-indigo-600 rounded-full mb-3">
                     <i class="fa-solid fa-file-pen text-3xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-slate-800">Registro de Estudiante</h2>
-                <p class="text-slate-500 text-sm mt-1">Ingresa tus datos completos para habilitar la prueba. Dispones de 35 minutos para resolver 30 ítems.</p>
+
+                <h2 class="text-2xl font-bold text-slate-800">
+                    Registro de Estudiante
+                </h2>
+
+                <p class="text-slate-500 text-sm mt-1">
+                    Ingresa tus datos completos para habilitar la prueba.
+                    Dispones de 35 minutos para resolver 30 ítems.
+                </p>
+
             </div>
 
-            <form id="formRegistro" onsubmit="iniciarEvaluacion(event)" class="max-w-md mx-auto space-y-4">
+
+            <form id="formRegistro"
+                  onsubmit="iniciarEvaluacion(event)"
+                  class="max-w-md mx-auto space-y-4">
+
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombres</label>
-                    <input type="text" id="nombreEstudiante" required placeholder="Ej. Juan Carlos" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Apellidos</label>
-                    <input type="text" id="apellidoEstudiante" required placeholder="Ej. Pérez Gómez" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Ingresa tu Código</label>
-                    <input type="text" id="codigoEstudiante" required placeholder="Ej. 2026014" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 font-mono">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                        Nombres
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombreEstudiante"
+                        required
+                        placeholder="Ej. Juan Carlos"
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
                 </div>
 
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                        Apellidos
+                    </label>
+
+                    <input
+                        type="text"
+                        id="apellidoEstudiante"
+                        required
+                        placeholder="Ej. Pérez Gómez"
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800">
+                </div>
+
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                        Código
+                    </label>
+
+                    <input
+                        type="text"
+                        id="codigoEstudiante"
+                        required
+                        placeholder="Ej. 2026014"
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-800 font-mono">
+                </div>
+
+
                 <div class="bg-rose-50 border border-rose-200 rounded-lg p-4 text-xs text-rose-800 space-y-1 mt-4">
-                    <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> Restricciones activas de seguridad:</p>
+
+                    <p class="font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Restricciones activas:
+                    </p>
+
                     <ul class="list-disc pl-5 space-y-0.5 text-rose-700">
-                        <li>Se requiere pantalla completa obligatoria todo el examen.</li>
-                        <li>Prohibido abrir pestañas, aplicaciones o cambiar de ventana.</li>
-                        <li>Bloqueados atajos de teclado, copiar, pegar y clic derecho.</li>
-                        <li><strong>Al acumular 3 infracciones la prueba se anula con 0.0.</strong></li>
+
+                        <li>
+                            Se requiere pantalla completa.
+                        </li>
+
+                        <li>
+                            No se permite cambiar de pestaña o ventana.
+                        </li>
+
+                        <li>
+                            Copiar, pegar y clic derecho están bloqueados.
+                        </li>
+
+                        <li>
+                            Al acumular 3 infracciones la prueba se anula con 0.0.
+                        </li>
+
                     </ul>
                 </div>
 
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition flex items-center justify-center space-x-2 mt-6">
-                    <span>Iniciar Examen en Modo Seguro</span>
+
+                <button
+                    type="submit"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition flex items-center justify-center space-x-2 mt-6">
+
+                    <span>
+                        Iniciar Examen en Modo Seguro
+                    </span>
+
                     <i class="fa-solid fa-arrow-right"></i>
+
                 </button>
+
             </form>
+
         </div>
 
-        <!-- PANTALLA DEL EXAMEN -->
-        <div id="pantallaExamen" class="hidden space-y-6">
+
+        <!-- EXAMEN -->
+        <div id="pantallaExamen"
+             class="hidden space-y-6">
+
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
+
                 <div class="text-xs">
-                    <span class="text-slate-500">Estudiante:</span>
-                    <strong id="nombreCompletoDisplay" class="text-slate-800 ml-1"></strong>
+
+                    <span class="text-slate-500">
+                        Estudiante:
+                    </span>
+
+                    <strong
+                        id="nombreCompletoDisplay"
+                        class="text-slate-800 ml-1">
+                    </strong>
+
                 </div>
-                <div class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-mono font-bold" id="codigoDisplay"></div>
+
+                <div
+                    class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-mono font-bold"
+                    id="codigoDisplay">
+                </div>
+
             </div>
 
-            <div id="contenedorPreguntas" class="space-y-6"></div>
+
+            <div id="contenedorPreguntas"
+                 class="space-y-6">
+            </div>
+
 
             <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex justify-end">
-                <button onclick="confirmarEnvio()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-lg shadow transition flex items-center space-x-2">
+
+                <button
+                    onclick="confirmarEnvio()"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-lg shadow transition flex items-center space-x-2">
+
                     <i class="fa-solid fa-check-circle"></i>
-                    <span>Finalizar y Entregar Examen</span>
+
+                    <span>
+                        Finalizar y Entregar Examen
+                    </span>
+
                 </button>
+
             </div>
+
         </div>
 
-        <!-- PANTALLA DE RESULTADO FINAL ESTUDIANTE -->
-        <div id="pantallaResultado" class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center max-w-lg mx-auto">
-            <div id="iconoResultado" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"></div>
-            <h2 id="tituloResultado" class="text-2xl font-bold text-slate-800"></h2>
-            <p id="mensajeResultado" class="text-sm text-slate-500 mt-2 mb-6"></p>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left space-y-2 text-sm">
-                <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Puntaje Obtenido:</span> <strong id="resNota" class="text-indigo-600 font-mono text-base"></strong></div>
-                <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Aciertos:</span> <strong id="resAciertos"></strong></div>
-                <div class="flex justify-between border-b pb-2"><span class="text-slate-500">Tiempo empleado:</span> <strong id="resTiempo"></strong></div>
-                <div class="flex justify-between"><span class="text-slate-500">Código Hash de Entrega:</span> <strong id="resHash" class="font-mono text-xs text-slate-600"></strong></div>
+        <!-- RESULTADO -->
+        <div id="pantallaResultado"
+             class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center max-w-lg mx-auto">
+
+            <div
+                id="iconoResultado"
+                class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
             </div>
 
-            <button onclick="location.reload()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium px-6 py-2.5 rounded-lg text-sm transition">
-                Volver al Inicio
+
+            <h2
+                id="tituloResultado"
+                class="text-2xl font-bold text-slate-800">
+            </h2>
+
+
+            <p
+                id="mensajeResultado"
+                class="text-sm text-slate-500 mt-2 mb-6">
+            </p>
+
+
+            <div
+                id="resultadoParaCaptura"
+                class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left space-y-3 text-sm">
+
+                <div class="text-center border-b pb-4">
+
+                    <h3 class="font-bold text-lg text-indigo-800">
+                        EVALUACIÓN DE MATEMÁTICA
+                    </h3>
+
+                    <p class="text-xs text-slate-500">
+                        Segundo Año de Bachillerato
+                    </p>
+
+                </div>
+
+
+                <div class="flex justify-between border-b pb-2">
+
+                    <span class="text-slate-500">
+                        Estudiante:
+                    </span>
+
+                    <strong id="resNombre">
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between border-b pb-2">
+
+                    <span class="text-slate-500">
+                        Código:
+                    </span>
+
+                    <strong id="resCodigo"
+                            class="font-mono">
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between border-b pb-2">
+
+                    <span class="text-slate-500">
+                        Puntaje:
+                    </span>
+
+                    <strong
+                        id="resNota"
+                        class="text-indigo-600 font-mono text-lg">
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between border-b pb-2">
+
+                    <span class="text-slate-500">
+                        Aciertos:
+                    </span>
+
+                    <strong id="resAciertos">
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between border-b pb-2">
+
+                    <span class="text-slate-500">
+                        Tiempo empleado:
+                    </span>
+
+                    <strong id="resTiempo">
+                    </strong>
+
+                </div>
+
+
+                <div class="flex justify-between">
+
+                    <span class="text-slate-500">
+                        Estado:
+                    </span>
+
+                    <strong id="resEstado">
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <button
+                onclick="generarCaptura()"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md transition flex items-center justify-center gap-2 mb-3">
+
+                <i class="fa-solid fa-camera"></i>
+
+                Guardar captura del resultado
+
             </button>
+
+
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-4">
+
+                <i class="fa-solid fa-circle-info mr-1"></i>
+
+                Guarda la captura y envíala a tu docente como comprobante de la evaluación.
+
+            </div>
+
+
+            <button
+                onclick="location.reload()"
+                class="bg-slate-800 hover:bg-slate-900 text-white font-medium px-6 py-2.5 rounded-lg text-sm transition">
+
+                Volver al Inicio
+
+            </button>
+
         </div>
 
     </main>
 
-    <!-- MODAL PANEL DOCENTE -->
-    <div id="modalAdmin" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
-            
-            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-user-shield text-indigo-400"></i>
-                    <h3 class="font-bold text-lg">Panel Docente - Registro de Calificaciones</h3>
-                </div>
-                <button onclick="cerrarModalAdmin()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
 
-            <div id="adminAuth" class="p-8 max-w-sm mx-auto w-full text-center space-y-4">
-                <i class="fa-solid fa-lock text-4xl text-indigo-600"></i>
-                                <h4 class="font-bold text-slate-800">Acceso seguro del docente</h4>
-                <input type="email" id="correoAdmin" placeholder="Correo del docente" autocomplete="username" class="w-full px-4 py-2 border rounded-lg text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                <input type="password" id="claveAdmin" placeholder="Contraseña" autocomplete="current-password" class="w-full px-4 py-2 border rounded-lg text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                <button onclick="autenticarAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition">Ingresar</button>
-            </div>
+    <!-- PIE -->
+    <footer
+        class="bg-slate-900 text-slate-400 text-xs py-4 text-center border-t border-slate-800">
 
-            <div id="adminContent" class="hidden flex-col flex-grow overflow-hidden p-6 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div class="flex items-center space-x-2 w-full sm:w-auto">
-                        <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
-                        <input type="text" id="filtroBusqueda" onkeyup="filtrarTabla()" placeholder="Buscar alumno o código..." class="px-3 py-1.5 text-sm border rounded-lg w-full sm:w-64 focus:outline-none">
-                    </div>
-                    <div class="flex space-x-2 w-full sm:w-auto justify-end">
-                        <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-medium transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-file-excel"></i>
-                            <span>Exportar a Excel (CSV)</span>
-                        </button>
-                        <button onclick="borrarTodosResultados()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
+        <p>
+            Evaluación Institucional de Matemática • Sistema de Evaluación en Línea
+        </p>
 
-                <div class="overflow-x-auto flex-grow border border-slate-200 rounded-xl">
-                    <table class="w-full text-left text-xs text-slate-600">
-                        <thead class="bg-slate-100 text-slate-700 font-bold uppercase border-b border-slate-200 sticky top-0">
-                            <tr>
-                                <th class="p-3">Estudiante</th>
-                                <th class="p-3">Código</th>
-                                <th class="p-3 text-center">Aciertos</th>
-                                <th class="p-3 text-center">Nota</th>
-                                <th class="p-3 text-center">Faltas</th>
-                                <th class="p-3 text-center">Tiempo</th>
-                                <th class="p-3 text-center">Estado</th>
-                                <th class="p-3 text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaResultadosBody" class="divide-y divide-slate-200 bg-white"></tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- PIE DE PÁGINA -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-4 text-center border-t border-slate-800">
-        <p>Evaluación Institucional de Matemática • Sistema Local de Evaluación En Línea</p>
     </footer>
 
-    <script>
-        // BANCO DE 30 PREGUNTAS
-        const bancoPreguntas = [
-            // BLOQUE 1
-            { id: 1, enunc: "[Números y %] Un artículo cuesta $80. ¿Cuánto representa el 15 % del precio?", opts: ["$8", "$12", "$15", "$10"], resp: 1 },
-            { id: 2, enunc: "[Números y %] Una mochila cuesta $45 y tiene un descuento del 20 %. ¿Cuál es el precio final?", opts: ["$36", "$35", "$40", "$38"], resp: 0 },
-            { id: 3, enunc: "[Proporcionalidad] En una receta, 3 tazas de harina alcanzan para 8 porciones. ¿Cuántas tazas se necesitan para 20 porciones?", opts: ["6.5", "7.5", "8.0", "7.0"], resp: 1 },
-            { id: 4, enunc: "[Leyes de Exponentes] Simplifica la siguiente expresión: 2³ × 2⁴", opts: ["2¹²", "4⁷", "2⁷", "2¹"], resp: 2 },
-            { id: 5, enunc: "[Porcentajes] Una cantidad de 240 aumenta un 12 %. ¿Cuál es el nuevo valor?", opts: ["268.8", "252.0", "260.0", "272.4"], resp: 0 },
 
-            // BLOQUE 2
-            { id: 6, enunc: "[Ecuaciones] Resuelve la ecuación: 3x - 7 = 14", opts: ["x = 5", "x = 7", "x = 6", "x = 8"], resp: 1 },
-            { id: 7, enunc: "[Álgebra] La suma de un número y el triple del mismo número es 48. ¿Cuál es el número?", opts: ["10", "12", "14", "16"], resp: 1 },
-            { id: 8, enunc: "[Ecuaciones] Resuelve: 2(x - 3) + 4 = 3x - 5", opts: ["x = 3", "x = 4", "x = 5", "x = -3"], resp: 0 },
-            { id: 9, enunc: "[Factorización] Factoriza la diferencia de cuadrados: x² - 9", opts: ["(x - 3)³", "(x - 9)(x + 1)", "(x - 3)(x + 3)", "(x - 3)²"], resp: 2 },
-            { id: 10, enunc: "[Ecuaciones Cuadráticas] Determina las soluciones de: x² - 5x + 6 = 0", opts: ["x = 2, x = 3", "x = -2, x = -3", "x = 1, x = 6", "x = -1, x = 5"], resp: 0 },
-            { id: 11, enunc: "[Sucesiones] En la sucesión aritmética 5, 9, 13, 17,... determina el término 20 (a₂₀).", opts: ["85", "81", "77", "80"], resp: 1 },
+<script>
 
-            // BLOQUE 3
-            { id: 12, enunc: "[Funciones] Si f(x) = 2x - 5, calcula el valor de f(4).", opts: ["3", "5", "8", "1"], resp: 0 },
-            { id: 13, enunc: "[Funciones Lineales] Una recta pasa por los puntos (0,3) y (2,7). Determina su pendiente (m).", opts: ["m = 1", "m = 2", "m = 3", "m = 4"], resp: 1 },
-            { id: 14, enunc: "[Funciones Cuadráticas] Determina las raíces de f(x) = x² - 4x + 3", opts: ["x = 1, x = 3", "x = -1, x = -3", "x = 0, x = 4", "x = 2, x = 3"], resp: 0 },
-            { id: 15, enunc: "[Transformaciones] ¿Qué desplazamiento produce y = (x - 2)² + 1 respecto a y = x²?", opts: ["2 unidades izquierda, 1 arriba", "2 unidades derecha, 1 arriba", "2 unidades abajo, 1 derecha", "1 unidad derecha, 2 arriba"], resp: 1 },
-            { id: 16, enunc: "[Composición de Funciones] Si f(x) = x + 1 y g(x) = 2x, calcula (f ∘ g)(3).", opts: ["8", "7", "9", "6"], resp: 1 },
+    // ==========================================================
+    // BANCO DE PREGUNTAS
+    // ==========================================================
 
-            // BLOQUE 4
-            { id: 17, enunc: "[Geometría Analítica] Determina la pendiente de la recta que pasa por (1,2) y (5,10).", opts: ["m = 2", "m = 1.5", "m = 3", "m = 4"], resp: 0 },
-            { id: 18, enunc: "[Geometría Analítica] Escribe la ecuación de la recta con pendiente 3 que pasa por (2, -1).", opts: ["y = 3x - 7", "y = 3x + 5", "y = 3x - 1", "y = 2x - 3"], resp: 0 },
-            { id: 19, enunc: "[Circunferencia] ¿Cuál es el centro C(h,k) de la circunferencia (x - 3)² + (y + 2)² = 25?", opts: ["(-3, 2)", "(3, -2)", "(3, 2)", "(-3, -2)"], resp: 1 },
-            { id: 20, enunc: "[Circunferencia] Determina el radio (r) de la ecuación (x + 1)² + (y - 4)² = 49", opts: ["r = 49", "r = 7", "r = 14", "r = 3.5"], resp: 1 },
-            { id: 21, enunc: "[Cónicas] Identifica el tipo de sección cónica representada por: 4x² + 9y² = 36", opts: ["Circunferencia", "Parábola", "Hipérbola", "Elipse"], resp: 3 },
+    const bancoPreguntas = [
 
-            // BLOQUE 5
-            { id: 22, enunc: "[Trigonometría] En un triángulo rectángulo, respecto al ángulo θ, el cateto opuesto mide 3 y la hipotenusa 5. Determina sen(θ).", opts: ["3/5 (0.6)", "4/5 (0.8)", "3/4 (0.75)", "5/3 (1.66)"], resp: 0 },
-            { id: 23, enunc: "[Trigonometría] Una escalera de 5 m se apoya formando 60° con el suelo. ¿Qué altura alcanza aproximadamente? [sen(60°)=0.866]", opts: ["4.33 m", "3.50 m", "2.50 m", "4.80 m"], resp: 0 },
-            { id: 24, enunc: "[Teorema del Coseno] En un triángulo, a=8, b=10 y C=60°. Determina el lado c usando c² = a² + b² - 2ab·cos(C).", opts: ["c = 8.94", "c = 9.16", "c = 10.2", "c = 7.80"], resp: 1 },
-            { id: 25, enunc: "[Ecuaciones Trigonométricas] Resuelve para θ en 0° ≤ θ ≤ 360° la ecuación: sen(θ) = 0", opts: ["0°, 180°, 360°", "90°, 270°", "45°, 225°", "0°, 90°, 180°"], resp: 0 },
+        { id: 1, enunc: "[Números y %] Un artículo cuesta $80. ¿Cuánto representa el 15 % del precio?", opts: ["$8", "$12", "$15", "$10"], resp: 1 },
 
-            // BLOQUE 6
-            { id: 26, enunc: "[Estadística] Calcula la media aritmética del siguiente conjunto de datos: 4, 6, 8, 10, 12", opts: ["7", "8", "9", "8.5"], resp: 1 },
-            { id: 27, enunc: "[Estadística] Determina la mediana de las notas: 6, 7, 7, 8, 10", opts: ["7", "7.5", "8", "6.8"], resp: 0 },
-            { id: 28, enunc: "[Conjuntos] Dados A = {1, 2, 3, 4} y B = {3, 4, 5}, determina la intersección A ∩ B.", opts: ["{1, 2, 3, 4, 5}", "{3, 4}", "{1, 2}", "{5}"], resp: 1 },
-            { id: 29, enunc: "[Combinatoria] ¿Cuántas maneras hay de elegir un comité de 2 estudiantes de un grupo total de 6?", opts: ["12", "15", "30", "10"], resp: 1 },
-            { id: 30, enunc: "[Probabilidad] Se lanza un dado justo de 6 caras. ¿Cuál es la probabilidad de obtener un número par?", opts: ["1/3 (33.3%)", "1/2 (50%)", "2/3 (66.6%)", "1/6 (16.6%)"], resp: 1 }
-        ];
+        { id: 2, enunc: "[Números y %] Una mochila cuesta $45 y tiene un descuento del 20 %. ¿Cuál es el precio final?", opts: ["$36", "$35", "$40", "$38"], resp: 0 },
 
-        // AUTENTICACIÓN ANÓNIMA PARA ESTUDIANTES
-        let usuarioFirebase = null;
-        function iniciarSesionEstudiante() {
-            if (!window.FirebaseExam) return;
-            window.FirebaseExam.onAuthStateChanged(window.FirebaseExam.auth, (user) => { usuarioFirebase = user; });
-            if (!window.FirebaseExam.auth.currentUser) {
-                window.FirebaseExam.signInAnonymously(window.FirebaseExam.auth).catch(err => console.error('Firebase Auth:', err));
-            }
+        { id: 3, enunc: "[Proporcionalidad] En una receta, 3 tazas de harina alcanzan para 8 porciones. ¿Cuántas tazas se necesitan para 20 porciones?", opts: ["6.5", "7.5", "8.0", "7.0"], resp: 1 },
+
+        { id: 4, enunc: "[Leyes de Exponentes] Simplifica la siguiente expresión: 2³ × 2⁴", opts: ["2¹²", "4⁷", "2⁷", "2¹"], resp: 2 },
+
+        { id: 5, enunc: "[Porcentajes] Una cantidad de 240 aumenta un 12 %. ¿Cuál es el nuevo valor?", opts: ["268.8", "252.0", "260.0", "272.4"], resp: 0 },
+
+        { id: 6, enunc: "[Ecuaciones] Resuelve la ecuación: 3x - 7 = 14", opts: ["x = 5", "x = 7", "x = 6", "x = 8"], resp: 1 },
+
+        { id: 7, enunc: "[Álgebra] La suma de un número y el triple del mismo número es 48. ¿Cuál es el número?", opts: ["10", "12", "14", "16"], resp: 1 },
+
+        { id: 8, enunc: "[Ecuaciones] Resuelve: 2(x - 3) + 4 = 3x - 5", opts: ["x = 3", "x = 4", "x = 5", "x = -3"], resp: 0 },
+
+        { id: 9, enunc: "[Factorización] Factoriza la diferencia de cuadrados: x² - 9", opts: ["(x - 3)³", "(x - 9)(x + 1)", "(x - 3)(x + 3)", "(x - 3)²"], resp: 2 },
+
+        { id: 10, enunc: "[Ecuaciones Cuadráticas] Determina las soluciones de: x² - 5x + 6 = 0", opts: ["x = 2, x = 3", "x = -2, x = -3", "x = 1, x = 6", "x = -1, x = 5"], resp: 0 },
+
+        { id: 11, enunc: "[Sucesiones] En la sucesión aritmética 5, 9, 13, 17,... determina el término 20 (a₂₀).", opts: ["85", "81", "77", "80"], resp: 1 },
+
+        { id: 12, enunc: "[Funciones] Si f(x) = 2x - 5, calcula el valor de f(4).", opts: ["3", "5", "8", "1"], resp: 0 },
+
+        { id: 13, enunc: "[Funciones Lineales] Una recta pasa por los puntos (0,3) y (2,7). Determina su pendiente (m).", opts: ["m = 1", "m = 2", "m = 3", "m = 4"], resp: 1 },
+
+        { id: 14, enunc: "[Funciones Cuadráticas] Determina las raíces de f(x) = x² - 4x + 3", opts: ["x = 1, x = 3", "x = -1, x = -3", "x = 0, x = 4", "x = 2, x = 3"], resp: 0 },
+
+        { id: 15, enunc: "[Transformaciones] ¿Qué desplazamiento produce y = (x - 2)² + 1 respecto a y = x²?", opts: ["2 unidades izquierda, 1 arriba", "2 unidades derecha, 1 arriba", "2 unidades abajo, 1 derecha", "1 unidad derecha, 2 arriba"], resp: 1 },
+
+        { id: 16, enunc: "[Composición de Funciones] Si f(x) = x + 1 y g(x) = 2x, calcula (f ∘ g)(3).", opts: ["8", "7", "9", "6"], resp: 1 },
+
+        { id: 17, enunc: "[Geometría Analítica] Determina la pendiente de la recta que pasa por (1,2) y (5,10).", opts: ["m = 2", "m = 1.5", "m = 3", "m = 4"], resp: 0 },
+
+        { id: 18, enunc: "[Geometría Analítica] Escribe la ecuación de la recta con pendiente 3 que pasa por (2, -1).", opts: ["y = 3x - 7", "y = 3x + 5", "y = 3x - 1", "y = 2x - 3"], resp: 0 },
+
+        { id: 19, enunc: "[Circunferencia] ¿Cuál es el centro C(h,k) de la circunferencia (x - 3)² + (y + 2)² = 25?", opts: ["(-3, 2)", "(3, -2)", "(3, 2)", "(-3, -2)"], resp: 1 },
+
+        { id: 20, enunc: "[Circunferencia] Determina el radio (r) de la ecuación (x + 1)² + (y - 4)² = 49", opts: ["r = 49", "r = 7", "r = 14", "r = 3.5"], resp: 1 },
+
+        { id: 21, enunc: "[Cónicas] Identifica el tipo de sección cónica representada por: 4x² + 9y² = 36", opts: ["Circunferencia", "Parábola", "Hipérbola", "Elipse"], resp: 3 },
+
+        { id: 22, enunc: "[Trigonometría] En un triángulo rectángulo, respecto al ángulo θ, el cateto opuesto mide 3 y la hipotenusa 5. Determina sen(θ).", opts: ["3/5 (0.6)", "4/5 (0.8)", "3/4 (0.75)", "5/3 (1.66)"], resp: 0 },
+
+        { id: 23, enunc: "[Trigonometría] Una escalera de 5 m se apoya formando 60° con el suelo. ¿Qué altura alcanza aproximadamente? [sen(60°)=0.866]", opts: ["4.33 m", "3.50 m", "2.50 m", "4.80 m"], resp: 0 },
+
+        { id: 24, enunc: "[Teorema del Coseno] En un triángulo, a=8, b=10 y C=60°. Determina el lado c.", opts: ["c = 8.94", "c = 9.16", "c = 10.2", "c = 7.80"], resp: 1 },
+
+        { id: 25, enunc: "[Ecuaciones Trigonométricas] Resuelve para θ en 0° ≤ θ ≤ 360° la ecuación: sen(θ) = 0", opts: ["0°, 180°, 360°", "90°, 270°", "45°, 225°", "0°, 90°, 180°"], resp: 0 },
+
+        { id: 26, enunc: "[Estadística] Calcula la media aritmética del siguiente conjunto de datos: 4, 6, 8, 10, 12", opts: ["7", "8", "9", "8.5"], resp: 1 },
+
+        { id: 27, enunc: "[Estadística] Determina la mediana de las notas: 6, 7, 7, 8, 10", opts: ["7", "7.5", "8", "6.8"], resp: 0 },
+
+        { id: 28, enunc: "[Conjuntos] Dados A = {1, 2, 3, 4} y B = {3, 4, 5}, determina la intersección A ∩ B.", opts: ["{1, 2, 3, 4, 5}", "{3, 4}", "{1, 2}", "{5}"], resp: 1 },
+
+        { id: 29, enunc: "[Combinatoria] ¿Cuántas maneras hay de elegir un comité de 2 estudiantes de un grupo total de 6?", opts: ["12", "15", "30", "10"], resp: 1 },
+
+        { id: 30, enunc: "[Probabilidad] Se lanza un dado justo de 6 caras. ¿Cuál es la probabilidad de obtener un número par?", opts: ["1/3 (33.3%)", "1/2 (50%)", "2/3 (66.6%)", "1/6 (16.6%)"], resp: 1 }
+
+    ];
+
+
+    // ==========================================================
+    // VARIABLES
+    // ==========================================================
+
+    let estudianteActual = null;
+
+    let tiempoRestante = 2100;
+
+    let timerInterval = null;
+
+    let infracciones = 0;
+
+    let respuestasEstudiante = {};
+
+    let examenEnCurso = false;
+
+    let procesandoAlerta = false;
+
+
+    // ==========================================================
+    // INICIAR EXAMEN
+    // ==========================================================
+
+    function iniciarEvaluacion(e) {
+
+        e.preventDefault();
+
+        const nombre =
+            document.getElementById('nombreEstudiante').value.trim();
+
+        const apellido =
+            document.getElementById('apellidoEstudiante').value.trim();
+
+        const codigo =
+            document.getElementById('codigoEstudiante').value.trim();
+
+
+        if (!nombre || !apellido || !codigo) return;
+
+
+        estudianteActual = {
+
+            id: Date.now(),
+
+            nombre: `${nombre} ${apellido}`,
+
+            codigo: codigo,
+
+            inicio: new Date().toLocaleTimeString()
+
+        };
+
+
+        Swal.fire({
+
+            title: '¿Listo para iniciar?',
+
+            text: 'El examen entrará en modo seguro. No podrás salir de la pantalla completa ni cambiar de pestaña.',
+
+            icon: 'warning',
+
+            showCancelButton: true,
+
+            confirmButtonText: 'Sí, empezar examen',
+
+            cancelButtonText: 'Cancelar',
+
+            confirmButtonColor: '#4f46e5'
+
+        }).then((res) => {
+
+            if (!res.isConfirmed) return;
+
+
+            solicitarPantallaCompleta();
+
+            renderizarPreguntas();
+
+
+            document.getElementById('pantallaInicio')
+                .classList.add('hidden');
+
+
+            document.getElementById('pantallaExamen')
+                .classList.remove('hidden');
+
+
+            document.getElementById('timerContainer')
+                .classList.remove('hidden');
+
+
+            document.getElementById('nombreCompletoDisplay')
+                .innerText = estudianteActual.nombre;
+
+
+            document.getElementById('codigoDisplay')
+                .innerText = `CÓD: ${estudianteActual.codigo}`;
+
+
+            examenEnCurso = true;
+
+            iniciarTemporizador();
+
+            activarSeguridadEstricta();
+
+        });
+
+    }
+
+
+    // ==========================================================
+    // MOSTRAR PREGUNTAS
+    // ==========================================================
+
+    function renderizarPreguntas() {
+
+        const container =
+            document.getElementById('contenedorPreguntas');
+
+        container.innerHTML = '';
+
+
+        const preguntasAleatorias =
+            [...bancoPreguntas];
+
+
+        for (
+            let i = preguntasAleatorias.length - 1;
+            i > 0;
+            i--
+        ) {
+
+            const j =
+                Math.floor(Math.random() * (i + 1));
+
+
+            [
+                preguntasAleatorias[i],
+                preguntasAleatorias[j]
+            ] =
+            [
+                preguntasAleatorias[j],
+                preguntasAleatorias[i]
+            ];
+
         }
-        if (window.FirebaseExam) iniciarSesionEstudiante();
-        window.addEventListener('firebase-ready', iniciarSesionEstudiante, { once: true });
 
-        // VARIABLES DE ESTADO
-        let estudianteActual = null;
-        let tiempoRestante = 2100; // 35 minutos
-        let timerInterval = null;
-        let infracciones = 0;
-        let respuestasEstudiante = {};
-        let examenEnCurso = false;
-        let procesandoAlerta = false;
 
-        // INICIAR EVALUACIÓN
-        function iniciarEvaluacion(e) {
-            e.preventDefault();
-            const nombre = document.getElementById('nombreEstudiante').value.trim();
-            const apellido = document.getElementById('apellidoEstudiante').value.trim();
-            const codigo = document.getElementById('codigoEstudiante').value.trim();
+        preguntasAleatorias.forEach((p, index) => {
 
-            if (!nombre || !apellido || !codigo) return;
+            const card =
+                document.createElement('div');
 
-            estudianteActual = {
-                id: Date.now(),
-                nombre: `${nombre} ${apellido}`,
-                codigo: codigo,
-                inicio: new Date().toLocaleTimeString()
-            };
 
-            Swal.fire({
-                title: '¿Listo para iniciar?',
-                text: 'El examen entrará en modo seguro restringido. No podrás salir de la pantalla completa ni cambiar de pestaña.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, empezar examen',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#4f46e5'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    solicitarPantallaCompleta();
-                    renderizarPreguntas();
-                    
-                    document.getElementById('pantallaInicio').classList.add('hidden');
-                    document.getElementById('pantallaExamen').classList.remove('hidden');
-                    document.getElementById('timerContainer').classList.remove('hidden');
+            card.className =
+                "bg-white p-6 rounded-xl shadow-md border border-slate-200 space-y-4";
 
-                    document.getElementById('nombreCompletoDisplay').innerText = estudianteActual.nombre;
-                    document.getElementById('codigoDisplay').innerText = `CÓD: ${estudianteActual.codigo}`;
 
-                    examenEnCurso = true;
-                    iniciarTemporizador();
-                    activarSeguridadEstricta();
-                }
-            });
-        }
+            let htmlOpts =
+                p.opts.map((opt, i) => `
 
-        function renderizarPreguntas() {
-            const container = document.getElementById('contenedorPreguntas');
-            container.innerHTML = '';
-
-            // Cada estudiante recibe las 30 preguntas en un orden diferente.
-            // La pregunta conserva su propia clave de respuesta.
-            const preguntasAleatorias = [...bancoPreguntas];
-            for (let i = preguntasAleatorias.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [preguntasAleatorias[i], preguntasAleatorias[j]] =
-                    [preguntasAleatorias[j], preguntasAleatorias[i]];
-            }
-
-            preguntasAleatorias.forEach((p, index) => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-xl shadow-md border border-slate-200 space-y-4";
-                
-                let htmlOpts = p.opts.map((opt, i) => `
                     <label class="flex items-center p-3 rounded-lg border border-slate-200 hover:bg-indigo-50/50 cursor-pointer transition text-sm">
-                        <input type="radio" name="preg_${p.id}" value="${i}" onchange="guardarRespuesta(${p.id}, ${i})" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                        <span class="ml-3 text-slate-700">${opt}</span>
+
+                        <input
+                            type="radio"
+                            name="preg_${p.id}"
+                            value="${i}"
+                            onchange="guardarRespuesta(${p.id}, ${i})"
+                            class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+
+                        <span class="ml-3 text-slate-700">
+                            ${opt}
+                        </span>
+
                     </label>
+
                 `).join('');
 
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-4">
-                        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-md">Ítem ${index + 1} de 30</span>
-                    </div>
-                    <p class="font-medium text-slate-800 text-base leading-relaxed">${p.enunc}</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                        ${htmlOpts}
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
 
-        function guardarRespuesta(pregId, optIndex) {
-            respuestasEstudiante[pregId] = optIndex;
-        }
+            card.innerHTML = `
 
-        function iniciarTemporizador() {
-            timerInterval = setInterval(() => {
-                tiempoRestante--;
-                
-                let mins = Math.floor(tiempoRestante / 60);
-                let secs = tiempoRestante % 60;
-                document.getElementById('timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                <div class="flex items-start justify-between gap-4">
 
-                if (tiempoRestante <= 0) {
-                    clearInterval(timerInterval);
-                    finalizarExamen(true, "Tiempo agotado");
-                }
-            }, 1000);
-        }
+                    <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2.5 py-1 rounded-md">
 
-        function solicitarPantallaCompleta() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => console.log(err));
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
+                        Ítem ${index + 1} de 30
+
+                    </span>
+
+                </div>
+
+
+                <p class="font-medium text-slate-800 text-base leading-relaxed">
+
+                    ${p.enunc}
+
+                </p>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+
+                    ${htmlOpts}
+
+                </div>
+
+            `;
+
+
+            container.appendChild(card);
+
+        });
+
+    }
+
+
+    // ==========================================================
+    // GUARDAR RESPUESTA
+    // ==========================================================
+
+    function guardarRespuesta(pregId, optIndex) {
+
+        respuestasEstudiante[pregId] = optIndex;
+
+    }
+
+
+    // ==========================================================
+    // TEMPORIZADOR
+    // ==========================================================
+
+    function iniciarTemporizador() {
+
+        timerInterval = setInterval(() => {
+
+            tiempoRestante--;
+
+
+            let mins =
+                Math.floor(tiempoRestante / 60);
+
+
+            let secs =
+                tiempoRestante % 60;
+
+
+            document.getElementById('timer').innerText =
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+
+            if (tiempoRestante <= 0) {
+
+                clearInterval(timerInterval);
+
+                finalizarExamen(
+                    true,
+                    "Tiempo agotado."
+                );
+
             }
+
+        }, 1000);
+
+    }
+
+
+    // ==========================================================
+    // PANTALLA COMPLETA
+    // ==========================================================
+
+    function solicitarPantallaCompleta() {
+
+        const elem =
+            document.documentElement;
+
+
+        if (elem.requestFullscreen) {
+
+            elem.requestFullscreen()
+                .catch(err => console.log(err));
+
         }
 
-        // SEGURIDAD REFORZADA (BLOQUEO DE PANTALLA Y PESTAÑAS)
-        function activarSeguridadEstricta() {
-            // Detección de cambio de pestaña/foco
-            window.addEventListener("blur", registrarFalta);
-            document.addEventListener("visibilitychange", () => {
-                if (document.hidden) registrarFalta();
-            });
+        else if (elem.webkitRequestFullscreen) {
 
-            // Detección de salida de Pantalla Completa
-            document.addEventListener("fullscreenchange", () => {
-                if (!document.fullscreenElement && examenEnCurso) {
+            elem.webkitRequestFullscreen();
+
+        }
+
+        else if (elem.msRequestFullscreen) {
+
+            elem.msRequestFullscreen();
+
+        }
+
+    }
+
+
+    // ==========================================================
+    // SEGURIDAD
+    // ==========================================================
+
+    function activarSeguridadEstricta() {
+
+        window.addEventListener(
+            "blur",
+            registrarFalta
+        );
+
+
+        document.addEventListener(
+            "visibilitychange",
+            () => {
+
+                if (document.hidden) {
+
                     registrarFalta();
-                }
-            });
 
-            // Bloqueo total de atajos de teclado
-            document.addEventListener("keydown", function(e) {
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            "fullscreenchange",
+            () => {
+
+                if (
+                    !document.fullscreenElement &&
+                    examenEnCurso
+                ) {
+
+                    registrarFalta();
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            function(e) {
+
                 if (!examenEnCurso) return;
 
-                const tecla = e.key.toLowerCase();
-                const codigo = e.keyCode;
 
-                // Bloquear Alt+Tab, Win, F11, F12, Ctrl+C, Ctrl+V, Ctrl+U, Ctrl+Shift+I, etc.
+                const tecla =
+                    e.key.toLowerCase();
+
+                const codigo =
+                    e.keyCode;
+
+
                 if (
-                    e.altKey || 
-                    tecla === 'meta' || 
-                    codigo === 122 || // F11
-                    codigo === 123 || // F12
-                    (e.ctrlKey && (tecla === 'c' || tecla === 'v' || tecla === 'x' || tecla === 'u' || tecla === 'p' || tecla === 'a' || tecla === 'n' || tecla === 't' || tecla === 'w')) ||
-                    (e.ctrlKey && e.shiftKey && (tecla === 'i' || tecla === 'j' || tecla === 'c'))
+
+                    e.altKey ||
+
+                    tecla === 'meta' ||
+
+                    codigo === 122 ||
+
+                    codigo === 123 ||
+
+                    (
+                        e.ctrlKey &&
+                        (
+                            tecla === 'c' ||
+                            tecla === 'v' ||
+                            tecla === 'x' ||
+                            tecla === 'u' ||
+                            tecla === 'p' ||
+                            tecla === 'a' ||
+                            tecla === 'n' ||
+                            tecla === 't' ||
+                            tecla === 'w'
+                        )
+                    ) ||
+
+                    (
+                        e.ctrlKey &&
+                        e.shiftKey &&
+                        (
+                            tecla === 'i' ||
+                            tecla === 'j' ||
+                            tecla === 'c'
+                        )
+                    )
+
                 ) {
+
                     e.preventDefault();
+
                     e.stopPropagation();
+
                     registrarFalta();
+
                     return false;
+
                 }
-            });
-        }
 
-        function registrarFalta() {
-            if (!examenEnCurso || procesandoAlerta) return;
-            procesandoAlerta = true;
-            infracciones++;
-
-            if (infracciones >= 3) {
-                finalizarExamen(true, "Prueba Anulada automáticamente por acumular 3 infracciones.");
-            } else {
-                Swal.fire({
-                    title: '¡VIOLACIÓN DE SEGURIDAD DETECTADA!',
-                    text: `Intentaste salir de la prueba o cambiar de pestaña. Infracción ${infracciones} de 3. Si alcanzas 3 faltas tu nota será 0.0.`,
-                    icon: 'error',
-                    confirmButtonText: 'Regresar al examen inmediatamente',
-                    confirmButtonColor: '#e11d48',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then(() => {
-                    solicitarPantallaCompleta();
-                    procesandoAlerta = false;
-                });
             }
+
+        );
+
+    }
+
+
+    // ==========================================================
+    // REGISTRAR INFRACCIÓN
+    // ==========================================================
+
+    function registrarFalta() {
+
+        if (
+            !examenEnCurso ||
+            procesandoAlerta
+        ) return;
+
+
+        procesandoAlerta = true;
+
+        infracciones++;
+
+
+        if (infracciones >= 3) {
+
+            finalizarExamen(
+                true,
+                "Prueba anulada automáticamente por acumular 3 infracciones."
+            );
+
         }
 
-        function confirmarEnvio() {
-            const respondidas = Object.keys(respuestasEstudiante).length;
+        else {
+
             Swal.fire({
-                title: '¿Deseas finalizar la prueba?',
-                text: `Has respondido ${respondidas} de 30 preguntas.`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, entregar examen',
-                cancelButtonText: 'Continuar respondiendo',
-                confirmButtonColor: '#059669'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    finalizarExamen(false, "Completado correctamente");
-                }
+
+                title:
+                    '¡VIOLACIÓN DE SEGURIDAD DETECTADA!',
+
+                text:
+                    `Infracción ${infracciones} de 3. Si alcanzas 3 faltas tu nota será 0.0.`,
+
+                icon: 'error',
+
+                confirmButtonText:
+                    'Regresar al examen',
+
+                confirmButtonColor:
+                    '#e11d48',
+
+                allowOutsideClick:
+                    false,
+
+                allowEscapeKey:
+                    false
+
+            }).then(() => {
+
+                solicitarPantallaCompleta();
+
+                procesandoAlerta = false;
+
             });
+
         }
 
-        async function finalizarExamen(anulado = false, motivo = "") {
-            examenEnCurso = false;
-            clearInterval(timerInterval);
+    }
 
-            let aciertos = 0;
-            if (!anulado) {
-                bancoPreguntas.forEach(p => {
-                    if (respuestasEstudiante[p.id] === p.resp) {
-                        aciertos++;
+
+    // ==========================================================
+    // CONFIRMAR ENTREGA
+    // ==========================================================
+
+    function confirmarEnvio() {
+
+        const respondidas =
+            Object.keys(respuestasEstudiante).length;
+
+
+        Swal.fire({
+
+            title:
+                '¿Deseas finalizar la prueba?',
+
+            text:
+                `Has respondido ${respondidas} de 30 preguntas.`,
+
+            icon: 'question',
+
+            showCancelButton: true,
+
+            confirmButtonText:
+                'Sí, entregar examen',
+
+            cancelButtonText:
+                'Continuar respondiendo',
+
+            confirmButtonColor:
+                '#059669'
+
+        }).then((res) => {
+
+            if (res.isConfirmed) {
+
+                finalizarExamen(
+                    false,
+                    "Completado correctamente"
+                );
+
+            }
+
+        });
+
+    }
+
+
+    // ==========================================================
+    // FINALIZAR
+    // ==========================================================
+
+    function finalizarExamen(
+        anulado = false,
+        motivo = ""
+    ) {
+
+        examenEnCurso = false;
+
+
+        clearInterval(timerInterval);
+
+
+        let aciertos = 0;
+
+
+        if (!anulado) {
+
+            bancoPreguntas.forEach(p => {
+
+                if (
+                    respuestasEstudiante[p.id] === p.resp
+                ) {
+
+                    aciertos++;
+
+                }
+
+            });
+
+        }
+
+
+        let nota =
+            anulado
+                ? 0.0
+                : parseFloat(
+                    ((aciertos / 30) * 10)
+                    .toFixed(1)
+                );
+
+
+        let tiempoEmpleadoSegs =
+            2100 - tiempoRestante;
+
+
+        let minsU =
+            Math.floor(tiempoEmpleadoSegs / 60);
+
+
+        let segsU =
+            tiempoEmpleadoSegs % 60;
+
+
+        let tiempoFormateado =
+            `${minsU}m ${segsU}s`;
+
+
+        document.exitFullscreen?.()
+            .catch(() => {});
+
+
+        document.getElementById('pantallaExamen')
+            .classList.add('hidden');
+
+
+        document.getElementById('timerContainer')
+            .classList.add('hidden');
+
+
+        document.getElementById('pantallaResultado')
+            .classList.remove('hidden');
+
+
+        // DATOS DEL RESULTADO
+
+        document.getElementById('resNombre')
+            .innerText =
+            estudianteActual.nombre;
+
+
+        document.getElementById('resCodigo')
+            .innerText =
+            estudianteActual.codigo;
+
+
+        document.getElementById('resNota')
+            .innerText =
+            `${nota.toFixed(1)} / 10.0`;
+
+
+        document.getElementById('resAciertos')
+            .innerText =
+            `${anulado ? 0 : aciertos} de 30`;
+
+
+        document.getElementById('resTiempo')
+            .innerText =
+            tiempoFormateado;
+
+
+        document.getElementById('resEstado')
+            .innerText =
+            anulado
+                ? 'ANULADO'
+                : 'COMPLETADO';
+
+
+        if (anulado) {
+
+            document.getElementById('iconoResultado')
+                .className =
+                "w-20 h-20 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4";
+
+
+            document.getElementById('iconoResultado')
+                .innerHTML =
+                `<i class="fa-solid fa-ban text-4xl"></i>`;
+
+
+            document.getElementById('tituloResultado')
+                .innerText =
+                "Prueba Anulada";
+
+
+            document.getElementById('mensajeResultado')
+                .innerText =
+                motivo;
+
+        }
+
+        else {
+
+            document.getElementById('iconoResultado')
+                .className =
+                "w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4";
+
+
+            document.getElementById('iconoResultado')
+                .innerHTML =
+                `<i class="fa-solid fa-circle-check text-4xl"></i>`;
+
+
+            document.getElementById('tituloResultado')
+                .innerText =
+                "Examen Entregado";
+
+
+            document.getElementById('mensajeResultado')
+                .innerText =
+                "Tu resultado ha sido calculado correctamente. Guarda la captura y envíala a tu docente.";
+
+        }
+
+    }
+
+
+    // ==========================================================
+    // GENERAR CAPTURA
+    // ==========================================================
+
+    async function generarCaptura() {
+
+        const elemento =
+            document.getElementById(
+                'resultadoParaCaptura'
+            );
+
+
+        Swal.fire({
+
+            title: 'Generando captura...',
+
+            text: 'Espera un momento.',
+
+            allowOutsideClick: false,
+
+            didOpen: () => {
+
+                Swal.showLoading();
+
+            }
+
+        });
+
+
+        try {
+
+            const canvas =
+                await html2canvas(
+                    elemento,
+                    {
+                        scale: 2,
+
+                        backgroundColor:
+                            "#ffffff",
+
+                        useCORS: true
+
                     }
-                });
-            }
-
-            let nota = anulado ? 0.0 : parseFloat(((aciertos / 30) * 10).toFixed(1));
-            let tiempoEmpleadoSegs = 2100 - tiempoRestante;
-            let minsU = Math.floor(tiempoEmpleadoSegs / 60);
-            let segsU = tiempoEmpleadoSegs % 60;
-            let tiempoFormateado = `${minsU}m ${segsU}s`;
-            let hashVerificacion = 'EV4P-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-
-            let resultadoFinal = {
-                id: estudianteActual.id,
-                nombre: estudianteActual.nombre,
-                codigo: estudianteActual.codigo,
-                aciertos: anulado ? 0 : aciertos,
-                nota: nota,
-                faltas: infracciones,
-                tiempo: tiempoFormateado,
-                estado: anulado ? 'Anulado' : 'Completado',
-                motivo: motivo,
-                hash: hashVerificacion,
-                fecha: new Date().toLocaleString()
-            };
-
-            // GUARDADO CENTRALIZADO EN FIRESTORE
-            try {
-                if (!usuarioFirebase) throw new Error('Sesión de estudiante no disponible.');
-                await window.FirebaseExam.addDoc(
-                    window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo'),
-                    { ...resultadoFinal, studentUid: usuarioFirebase.uid, creadoEn: window.FirebaseExam.serverTimestamp() }
                 );
-            } catch (error) {
-                console.error('Error guardando resultado:', error);
-                Swal.fire('Error de conexión', 'La nota no pudo registrarse en la base central. Verifica Internet e inténtalo nuevamente.', 'error');
-                return;
-            }
 
-            if (document.exitFullscreen) {
-                document.exitFullscreen().catch(e => {});
-            }
 
-            document.getElementById('pantallaExamen').classList.add('hidden');
-            document.getElementById('timerContainer').classList.add('hidden');
-            document.getElementById('pantallaResultado').classList.remove('hidden');
+            const enlace =
+                document.createElement('a');
 
-            const iconoRes = document.getElementById('iconoResultado');
-            if (anulado) {
-                iconoRes.className = "w-20 h-20 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4";
-                iconoRes.innerHTML = `<i class="fa-solid fa-ban text-4xl"></i>`;
-                document.getElementById('tituloResultado').innerText = "Prueba Anulada";
-                document.getElementById('mensajeResultado').innerText = motivo;
-            } else {
-                iconoRes.className = "w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4";
-                iconoRes.innerHTML = `<i class="fa-solid fa-circle-check text-4xl"></i>`;
-                document.getElementById('tituloResultado').innerText = "Examen Entregado";
-                document.getElementById('mensajeResultado').innerText = "Tus respuestas han sido registradas exitosamente en la plataforma.";
-            }
 
-            document.getElementById('resNota').innerText = `${nota.toFixed(1)} / 10.0`;
-            document.getElementById('resAciertos').innerText = `${anulado ? 0 : aciertos} de 30`;
-            document.getElementById('resTiempo').innerText = tiempoFormateado;
-            document.getElementById('resHash').innerText = hashVerificacion;
-        }
+            const nombre =
+                estudianteActual.nombre
+                    .replace(/\s+/g, '_');
 
-        // PANEL DOCENTE
-        function abrirModalAdmin() {
-            document.getElementById('modalAdmin').classList.remove('hidden');
-        }
 
-        function cerrarModalAdmin() {
-            document.getElementById('modalAdmin').classList.add('hidden');
-        }
+            enlace.download =
+                `Resultado_${nombre}.png`;
 
-        async function autenticarAdmin() {
-            const correo = document.getElementById('correoAdmin').value.trim();
-            const clave = document.getElementById('claveAdmin').value;
-            if (!correo || !clave) {
-                Swal.fire('Atención', 'Ingrese correo y contraseña.', 'warning');
-                return;
-            }
-            try {
-                await window.FirebaseExam.signInWithEmailAndPassword(window.FirebaseExam.auth, correo, clave);
-                document.getElementById('adminAuth').classList.add('hidden');
-                document.getElementById('adminContent').classList.remove('hidden');
-                document.getElementById('adminContent').classList.add('flex');
-                await cargarTablaResultados();
-            } catch (error) {
-                console.error(error);
-                Swal.fire('Acceso denegado', 'Correo o contraseña incorrectos, o la cuenta no está autorizada como docente.', 'error');
-            }
-        }
 
-        async function cargarTablaResultados() {
-            const tbody = document.getElementById('tablaResultadosBody');
-            tbody.innerHTML = '';
-            let historial = [];
-            try {
-                const q = window.FirebaseExam.query(
-                    window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo'),
-                    window.FirebaseExam.orderBy('fecha', 'desc')
+            enlace.href =
+                canvas.toDataURL(
+                    'image/png'
                 );
-                const snap = await window.FirebaseExam.getDocs(q);
-                snap.forEach(d => historial.push({ _docId: d.id, ...d.data() }));
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-rose-600">No se pudieron cargar las calificaciones. Revisa Firebase y las Security Rules.</td></tr>`;
-                return;
-            }
-            if (historial.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">No hay intentos registrados aún.</td></tr>`;
-                return;
-            }
-            historial.forEach((item, index) => {
-                let badgeEstado = item.estado === 'Completado'
-                    ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Completado</span>`
-                    : `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold">Anulado</span>`;
-                let row = document.createElement('tr');
-                row.className = "hover:bg-slate-50";
-                row.dataset.docId = item._docId;
-                row.innerHTML = `
-                    <td class="p-3 font-semibold text-slate-800">${item.nombre}</td>
-                    <td class="p-3 font-mono text-slate-600">${item.codigo}</td>
-                    <td class="p-3 text-center">${item.aciertos} / 30</td>
-                    <td class="p-3 text-center font-mono font-bold text-indigo-600 text-sm">${Number(item.nota).toFixed(1)}</td>
-                    <td class="p-3 text-center text-rose-600 font-bold">${item.faltas}</td>
-                    <td class="p-3 text-center">${item.tiempo}</td>
-                    <td class="p-3 text-center">${badgeEstado}</td>
-                    <td class="p-3 text-center space-x-1"><button onclick="eliminarRegistroPorId('${item._docId}')" class="text-slate-400 hover:text-rose-600 p-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td>`;
-                tbody.appendChild(row);
+
+
+            enlace.click();
+
+
+            Swal.fire({
+
+                title:
+                    '¡Captura lista!',
+
+                text:
+                    'Guarda la imagen y envíala a tu docente como comprobante.',
+
+                icon:
+                    'success',
+
+                confirmButtonColor:
+                    '#4f46e5'
+
             });
+
         }
 
-        function filtrarTabla() {
-            const filtro = document.getElementById('filtroBusqueda').value.toLowerCase();
-            const filas = document.querySelectorAll('#tablaResultadosBody tr');
-            filas.forEach(fila => {
-                const texto = fila.innerText.toLowerCase();
-                fila.style.display = texto.includes(filtro) ? '' : 'none';
+        catch (error) {
+
+            console.error(error);
+
+
+            Swal.fire({
+
+                title:
+                    'No se pudo generar la captura',
+
+                text:
+                    'Puedes tomar una captura de pantalla manual del resultado.',
+
+                icon:
+                    'error'
+
             });
+
         }
 
-        async function eliminarRegistroPorId(docId) {
-            Swal.fire({ title:'¿Eliminar registro?', text:'Esta acción no se puede deshacer.', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, eliminar', confirmButtonColor:'#e11d48' }).then(async (res) => {
-                if (!res.isConfirmed) return;
-                try {
-                    await window.FirebaseExam.deleteDoc(window.FirebaseExam.doc(window.FirebaseExam.db, 'evaluaciones_iv_periodo', docId));
-                    await cargarTablaResultados();
-                } catch (e) {
-                    console.error(e); Swal.fire('Error','No se pudo eliminar el registro.','error');
-                }
-            });
-        }
+    }
 
-        async function borrarTodosResultados() {
-            Swal.fire({ title:'¿Borrar TODOS los registros?', text:'Se eliminarán las notas de todos los alumnos. Esta acción no se puede deshacer.', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, borrar todo', confirmButtonColor:'#e11d48' }).then(async (res) => {
-                if (!res.isConfirmed) return;
-                try {
-                    const snap = await window.FirebaseExam.getDocs(window.FirebaseExam.query(window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo')));
-                    await Promise.all(snap.docs.map(d => window.FirebaseExam.deleteDoc(window.FirebaseExam.doc(window.FirebaseExam.db, 'evaluaciones_iv_periodo', d.id))));
-                    await cargarTablaResultados();
-                } catch (e) { console.error(e); Swal.fire('Error','No se pudieron borrar todos los registros.','error'); }
-            });
-        }
+</script>
 
-        async function exportarCSV() {
-            let historial = [];
-            try {
-                const q = window.FirebaseExam.query(window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo'), window.FirebaseExam.orderBy('fecha', 'desc'));
-                const snap = await window.FirebaseExam.getDocs(q);
-                snap.forEach(d => historial.push(d.data()));
-            } catch (e) {
-                Swal.fire('Error','No se pudieron cargar las notas para exportarlas.','error'); return;
-            }
-            if (!historial.length) { Swal.fire('Atención','No hay datos para exportar','info'); return; }
-            let csvContent = "data:text/csv;charset=utf-8,Estudiante,Codigo,Aciertos,Nota,Faltas,Tiempo,Estado,Fecha,Hash\n";
-            historial.forEach(r => { csvContent += `"${r.nombre}","${r.codigo}",${r.aciertos},${r.nota},${r.faltas},"${r.tiempo}","${r.estado}","${r.fecha}","${r.hash}"\n`; });
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a"); link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Notas_Evaluacion_IV_Periodo_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-
-        async function cerrarSesionDocente() {
-            try { await window.FirebaseExam.signOut(window.FirebaseExam.auth); } catch(e) {}
-            document.getElementById('adminContent').classList.add('hidden');
-            document.getElementById('adminContent').classList.remove('flex');
-            document.getElementById('adminAuth').classList.remove('hidden');
-            document.getElementById('correoAdmin').value = '';
-            document.getElementById('claveAdmin').value = '';
-        }
-
-    </script>
 </body>
 </html>
+```
