@@ -112,11 +112,12 @@
         </div>
 
         <!-- PANTALLA DE RESULTADO FINAL ESTUDIANTE -->
+        
         <div id="pantallaResultado" class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 p-8 text-center max-w-lg mx-auto">
             <div id="iconoResultado" class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"></div>
             <h2 id="tituloResultado" class="text-2xl font-bold text-slate-800"></h2>
             <p id="mensajeResultado" class="text-sm text-slate-500 mt-2 mb-6"></p>
-            enviarNotaAGoogleSheets(document.getElementById("resNota").innerText);
+
 
 
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-left space-y-2 text-sm">
@@ -488,6 +489,7 @@
             document.getElementById('pantallaExamen').classList.add('hidden');
             document.getElementById('timerContainer').classList.add('hidden');
             document.getElementById('pantallaResultado').classList.remove('hidden');
+            enviarNotaAGoogleSheets(document.getElementById("mensajeResultado").innerText);
 
             const iconoRes = document.getElementById('iconoResultado');
             if (anulado) {
