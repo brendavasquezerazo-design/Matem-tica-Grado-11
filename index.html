@@ -18,6 +18,28 @@
             background-color: #f1f5f9;
         }
     </style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+        // REEMPLAZA ESTOS VALORES CON LOS DE TU PROYECTO FIREBASE.
+        const firebaseConfig = {
+            apiKey: "REEMPLAZAR_API_KEY",
+            authDomain: "REEMPLAZAR_PROJECT_ID.firebaseapp.com",
+            projectId: "REEMPLAZAR_PROJECT_ID",
+            storageBucket: "REEMPLAZAR_PROJECT_ID.firebasestorage.app",
+            messagingSenderId: "REEMPLAZAR_MESSAGING_SENDER_ID",
+            appId: "REEMPLAZAR_APP_ID"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        window.FirebaseExam = { auth, db, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp };
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+
 </head>
 <body class="no-select text-slate-800 antialiased min-h-screen flex flex-col justify-between" oncontextmenu="return false;" oncopy="return false;" onpaste="return false;" oncut="return false;" ondragstart="return false;" ondrop="return false;">
 
@@ -145,8 +167,9 @@
 
             <div id="adminAuth" class="p-8 max-w-sm mx-auto w-full text-center space-y-4">
                 <i class="fa-solid fa-lock text-4xl text-indigo-600"></i>
-                <h4 class="font-bold text-slate-800">Ingrese la Clave del Docente</h4>
-                <input type="password" id="claveAdmin" placeholder="Contraseña" class="w-full px-4 py-2 border rounded-lg text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <h4 class="font-bold text-slate-800">Acceso seguro del docente</h4>
+                <input type="email" id="correoAdmin" placeholder="Correo del docente" autocomplete="username" class="w-full px-4 py-2 border rounded-lg text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <input type="password" id="claveAdmin" placeholder="Contraseña" autocomplete="current-password" class="w-full px-4 py-2 border rounded-lg text-center focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 <button onclick="autenticarAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition">Ingresar</button>
             </div>
 
@@ -239,6 +262,18 @@
             { id: 29, enunc: "[Combinatoria] ¿Cuántas maneras hay de elegir un comité de 2 estudiantes de un grupo total de 6?", opts: ["12", "15", "30", "10"], resp: 1 },
             { id: 30, enunc: "[Probabilidad] Se lanza un dado justo de 6 caras. ¿Cuál es la probabilidad de obtener un número par?", opts: ["1/3 (33.3%)", "1/2 (50%)", "2/3 (66.6%)", "1/6 (16.6%)"], resp: 1 }
         ];
+
+        // AUTENTICACIÓN ANÓNIMA PARA ESTUDIANTES
+        let usuarioFirebase = null;
+        function iniciarSesionEstudiante() {
+            if (!window.FirebaseExam) return;
+            window.FirebaseExam.onAuthStateChanged(window.FirebaseExam.auth, (user) => { usuarioFirebase = user; });
+            if (!window.FirebaseExam.auth.currentUser) {
+                window.FirebaseExam.signInAnonymously(window.FirebaseExam.auth).catch(err => console.error('Firebase Auth:', err));
+            }
+        }
+        if (window.FirebaseExam) iniciarSesionEstudiante();
+        window.addEventListener('firebase-ready', iniciarSesionEstudiante, { once: true });
 
         // VARIABLES DE ESTADO
         let estudianteActual = null;
@@ -438,7 +473,7 @@
             });
         }
 
-        function finalizarExamen(anulado = false, motivo = "") {
+        async function finalizarExamen(anulado = false, motivo = "") {
             examenEnCurso = false;
             clearInterval(timerInterval);
 
@@ -472,9 +507,18 @@
                 fecha: new Date().toLocaleString()
             };
 
-            let historial = JSON.parse(localStorage.getItem('evaluaciones_iv_periodo') || '[]');
-            historial.push(resultadoFinal);
-            localStorage.setItem('evaluaciones_iv_periodo', JSON.stringify(historial));
+            // GUARDADO CENTRALIZADO EN FIRESTORE
+            try {
+                if (!usuarioFirebase) throw new Error('Sesión de estudiante no disponible.');
+                await window.FirebaseExam.addDoc(
+                    window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo'),
+                    { ...resultadoFinal, studentUid: usuarioFirebase.uid, creadoEn: window.FirebaseExam.serverTimestamp() }
+                );
+            } catch (error) {
+                console.error('Error guardando resultado:', error);
+                Swal.fire('Error de conexión', 'La nota no pudo registrarse en la base central. Verifica Internet e inténtalo nuevamente.', 'error');
+                return;
+            }
 
             if (document.exitFullscreen) {
                 document.exitFullscreen().catch(e => {});
@@ -512,47 +556,61 @@
             document.getElementById('modalAdmin').classList.add('hidden');
         }
 
-        function autenticarAdmin() {
+        async function autenticarAdmin() {
+            const correo = document.getElementById('correoAdmin').value.trim();
             const clave = document.getElementById('claveAdmin').value;
-            if (clave === 'admin123') {
+            if (!correo || !clave) {
+                Swal.fire('Atención', 'Ingrese correo y contraseña.', 'warning');
+                return;
+            }
+            try {
+                await window.FirebaseExam.signInWithEmailAndPassword(window.FirebaseExam.auth, correo, clave);
                 document.getElementById('adminAuth').classList.add('hidden');
                 document.getElementById('adminContent').classList.remove('hidden');
                 document.getElementById('adminContent').classList.add('flex');
-                cargarTablaResultados();
-            } else {
-                Swal.fire('Error', 'Contraseña incorrecta', 'error');
+                await cargarTablaResultados();
+            } catch (error) {
+                console.error(error);
+                Swal.fire('Acceso denegado', 'Correo o contraseña incorrectos, o la cuenta no está autorizada como docente.', 'error');
             }
         }
 
-        function cargarTablaResultados() {
+        async function cargarTablaResultados() {
             const tbody = document.getElementById('tablaResultadosBody');
             tbody.innerHTML = '';
-            let historial = JSON.parse(localStorage.getItem('evaluaciones_iv_periodo') || '[]');
-
+            let historial = [];
+            try {
+                const q = window.FirebaseExam.query(
+                    window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo'),
+                    window.FirebaseExam.orderBy('fecha', 'desc')
+                );
+                const snap = await window.FirebaseExam.getDocs(q);
+                snap.forEach(d => historial.push({ _docId: d.id, ...d.data() }));
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-rose-600">No se pudieron cargar las calificaciones. Revisa Firebase y las Security Rules.</td></tr>`;
+                return;
+            }
             if (historial.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">No hay intentos registrados aún.</td></tr>`;
                 return;
             }
-
             historial.forEach((item, index) => {
-                let badgeEstado = item.estado === 'Completado' 
+                let badgeEstado = item.estado === 'Completado'
                     ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-bold">Completado</span>`
                     : `<span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full font-bold">Anulado</span>`;
-
                 let row = document.createElement('tr');
                 row.className = "hover:bg-slate-50";
+                row.dataset.docId = item._docId;
                 row.innerHTML = `
                     <td class="p-3 font-semibold text-slate-800">${item.nombre}</td>
                     <td class="p-3 font-mono text-slate-600">${item.codigo}</td>
                     <td class="p-3 text-center">${item.aciertos} / 30</td>
-                    <td class="p-3 text-center font-mono font-bold text-indigo-600 text-sm">${item.nota.toFixed(1)}</td>
+                    <td class="p-3 text-center font-mono font-bold text-indigo-600 text-sm">${Number(item.nota).toFixed(1)}</td>
                     <td class="p-3 text-center text-rose-600 font-bold">${item.faltas}</td>
                     <td class="p-3 text-center">${item.tiempo}</td>
                     <td class="p-3 text-center">${badgeEstado}</td>
-                    <td class="p-3 text-center space-x-1">
-                        <button onclick="eliminarRegistro(${index})" class="text-slate-400 hover:text-rose-600 p-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                `;
+                    <td class="p-3 text-center space-x-1"><button onclick="eliminarRegistroPorId('${item._docId}')" class="text-slate-400 hover:text-rose-600 p-1" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td>`;
                 tbody.appendChild(row);
             });
         }
@@ -566,60 +624,56 @@
             });
         }
 
-        function eliminarRegistro(index) {
-            Swal.fire({
-                title: '¿Eliminar registro?',
-                text: 'Esta acción no se puede deshacer.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                confirmButtonColor: '#e11d48'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    let historial = JSON.parse(localStorage.getItem('evaluaciones_iv_periodo') || '[]');
-                    historial.splice(index, 1);
-                    localStorage.setItem('evaluaciones_iv_periodo', JSON.stringify(historial));
-                    cargarTablaResultados();
+        async function eliminarRegistroPorId(docId) {
+            Swal.fire({ title:'¿Eliminar registro?', text:'Esta acción no se puede deshacer.', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, eliminar', confirmButtonColor:'#e11d48' }).then(async (res) => {
+                if (!res.isConfirmed) return;
+                try {
+                    await window.FirebaseExam.deleteDoc(window.FirebaseExam.doc(window.FirebaseExam.db, 'evaluaciones_iv_periodo', docId));
+                    await cargarTablaResultados();
+                } catch (e) {
+                    console.error(e); Swal.fire('Error','No se pudo eliminar el registro.','error');
                 }
             });
         }
 
-        function borrarTodosResultados() {
-            Swal.fire({
-                title: '¿Borrar TODOS los registros?',
-                text: 'Se eliminarán las notas de todos los alumnos.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, borrar todo',
-                confirmButtonColor: '#e11d48'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    localStorage.removeItem('evaluaciones_iv_periodo');
-                    cargarTablaResultados();
-                }
+        async function borrarTodosResultados() {
+            Swal.fire({ title:'¿Borrar TODOS los registros?', text:'Se eliminarán las notas de todos los alumnos. Esta acción no se puede deshacer.', icon:'warning', showCancelButton:true, confirmButtonText:'Sí, borrar todo', confirmButtonColor:'#e11d48' }).then(async (res) => {
+                if (!res.isConfirmed) return;
+                try {
+                    const snap = await window.FirebaseExam.getDocs(window.FirebaseExam.query(window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo')));
+                    await Promise.all(snap.docs.map(d => window.FirebaseExam.deleteDoc(window.FirebaseExam.doc(window.FirebaseExam.db, 'evaluaciones_iv_periodo', d.id))));
+                    await cargarTablaResultados();
+                } catch (e) { console.error(e); Swal.fire('Error','No se pudieron borrar todos los registros.','error'); }
             });
         }
 
-        function exportarCSV() {
-            let historial = JSON.parse(localStorage.getItem('evaluaciones_iv_periodo') || '[]');
-            if (historial.length === 0) {
-                Swal.fire('Atención', 'No hay datos para exportar', 'info');
-                return;
+        async function exportarCSV() {
+            let historial = [];
+            try {
+                const q = window.FirebaseExam.query(window.FirebaseExam.collection(window.FirebaseExam.db, 'evaluaciones_iv_periodo'), window.FirebaseExam.orderBy('fecha', 'desc'));
+                const snap = await window.FirebaseExam.getDocs(q);
+                snap.forEach(d => historial.push(d.data()));
+            } catch (e) {
+                Swal.fire('Error','No se pudieron cargar las notas para exportarlas.','error'); return;
             }
-
+            if (!historial.length) { Swal.fire('Atención','No hay datos para exportar','info'); return; }
             let csvContent = "data:text/csv;charset=utf-8,Estudiante,Codigo,Aciertos,Nota,Faltas,Tiempo,Estado,Fecha,Hash\n";
-            historial.forEach(r => {
-                csvContent += `"${r.nombre}","${r.codigo}",${r.aciertos},${r.nota},${r.faltas},"${r.tiempo}","${r.estado}","${r.fecha}","${r.hash}"\n`;
-            });
-
+            historial.forEach(r => { csvContent += `"${r.nombre}","${r.codigo}",${r.aciertos},${r.nota},${r.faltas},"${r.tiempo}","${r.estado}","${r.fecha}","${r.hash}"\n`; });
             const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
+            const link = document.createElement("a"); link.setAttribute("href", encodedUri);
             link.setAttribute("download", `Notas_Evaluacion_IV_Periodo_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
+
+        async function cerrarSesionDocente() {
+            try { await window.FirebaseExam.signOut(window.FirebaseExam.auth); } catch(e) {}
+            document.getElementById('adminContent').classList.add('hidden');
+            document.getElementById('adminContent').classList.remove('flex');
+            document.getElementById('adminAuth').classList.remove('hidden');
+            document.getElementById('correoAdmin').value = '';
+            document.getElementById('claveAdmin').value = '';
+        }
+
     </script>
 </body>
 </html>
